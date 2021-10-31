@@ -10,9 +10,6 @@ inputs:
   project_number:
     description: 'Project board number'
     required: true
-  content_id:
-    description: 'The GitHub global ID of the item to be added'
-    required: true
 outputs:
   card_id:
     description: 'The card ID for the item on the board'

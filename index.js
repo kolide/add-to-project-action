@@ -1,5 +1,5 @@
-const core = require('@actions/core');
-const fetch = require("node-fetch");
+import * as core from '@actions/core'
+import * as github from '@actions/github'
 
 const project_metadata_query = `
 query($org: String!, $number: Int!) {
@@ -26,41 +26,48 @@ mutation($project:ID!, $target:ID!) {
   }
 }`;
 
-async function gh_query(token, query, variables) {
-  return fetch("https://api.github.com/graphql", {
-    method: "POST",
-    body: JSON.stringify({ query, variables }),
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      Authorization: `bearer ${token}`
-    }
-  }).then(function(response) {
-    return response.json();
-  });
-}
+const getContentId = context => {
+  switch(context.eventName) {
+  case 'pull_request':
+    return context.payload.pull_request.node_id;
+  case 'pull_request_target':
+    return context.payload.pull_request.node_id;
+  case 'issues':
+    return context.payload.issue.node_id;
+  default:
+    throw new Error(`Unknown event type ${context.eventName}`);
+  };
+};
 
 // most @actions toolkit packages have async methods
 async function run() {
   try {
-    const github_token = core.getInput("token");
     const organization = core.getInput("organization");
     const project_number = core.getInput("project_number");
-    const content_id = core.getInput("content_id");
-    core.info(`Going to add ${content_id} to ${organization}/${project_number}`);
 
-    const project_metadata_vars = { org: organization, number: parseInt(project_number) };
-    const project_metadata_resp = await gh_query(github_token, project_metadata_query, project_metadata_vars);
-    core.debug("Project Metadata: " + JSON.stringify(project_metadata_resp));
+    const content_id = getContentId(github.context);
+    core.info(`Going to add '${content_id}' to ${organization}/${project_number}`);
 
-    const project_id = project_metadata_resp["data"]["organization"]["projectNext"]["id"];
+    const octokit = github.getOctokit(core.getInput("token"));
+
+    const project_metadata_resp = await octokit.graphql(
+      project_metadata_query,
+      { org: organization, number: parseInt(project_number) }
+    );
+    core.debug("Project Metadata:")
+    core.debug(JSON.stringify(project_metadata_resp));
+
+    const project_id = project_metadata_resp["organization"]["projectNext"]["id"];
     core.debug(`Found project_id: ${project_id}`);
 
-    const mutation_vars = { project: project_id, target: content_id };
-    const mutation_resp = await gh_query(github_token, add_to_project_mutation, mutation_vars);
-    core.debug("Mutation Response: " + JSON.stringify(mutation_resp));
+    const mutation_resp = await octokit.graphql(
+      add_to_project_mutation,
+      { project: project_id, target: content_id }
+    );
+    core.debug("Mutation Response:")
+    core.debug(JSON.stringify(mutation_resp));
 
-    const card_id = mutation_resp["data"]["addProjectNextItem"]["projectNextItem"]["id"];
+    const card_id = mutation_resp["addProjectNextItem"]["projectNextItem"]["id"];
     core.debug(`Got card_id: ${card_id}`);
 
     core.setOutput('card_id', card_id);
