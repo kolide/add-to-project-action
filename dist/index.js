@@ -8577,7 +8577,7 @@ async function run() {
     _actions_core__WEBPACK_IMPORTED_MODULE_0__.debug(JSON.stringify(mutation_resp));
 
     const card_id = mutation_resp["addProjectNextItem"]["projectNextItem"]["id"];
-    _actions_core__WEBPACK_IMPORTED_MODULE_0__.debug(`Got card_id: ${card_id}`);
+    _actions_core__WEBPACK_IMPORTED_MODULE_0__.info(`Added to board as card_id: '${card_id}'`);
 
     _actions_core__WEBPACK_IMPORTED_MODULE_0__.setOutput('card_id', card_id);
   } catch (error) {

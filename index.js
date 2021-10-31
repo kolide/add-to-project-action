@@ -87,7 +87,7 @@ async function run() {
     core.debug(JSON.stringify(mutation_resp));
 
     const card_id = mutation_resp["addProjectNextItem"]["projectNextItem"]["id"];
-    core.debug(`Got card_id: ${card_id}`);
+    core.info(`Added to board as card_id: '${card_id}'`);
 
     core.setOutput('card_id', card_id);
   } catch (error) {
