@@ -56,7 +56,7 @@ async function run() {
   try {
     const organization = core.getInput("organization");
     const project_number = core.getInput("project_number");
-    const only_labeled = core.getInput("only_labeled");
+    const only_labeled = core.getInput("only_labeled").split(',');
 
     const content_metadata = getContentId(github.context);
 
