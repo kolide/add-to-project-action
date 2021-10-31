@@ -11,19 +11,19 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/directionless/add-to-project-action.git"
+    "url": "git+https://github.com/kolide/add-to-project-action.git"
   },
   "keywords": [
     "GitHub",
     "Actions",
     "JavaScript"
   ],
-  "author": "directionless",
+  "author": "seph <seph@kolide.co>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/directionless/add-to-project-action/issues"
+    "url": "https://github.com/kolide/add-to-project-action/issues"
   },
-  "homepage": "https://github.com/directionless/add-to-project-action#readme",
+  "homepage": "https://github.com/kolide/add-to-project-action#readme",
   "dependencies": {
     "@actions/core": "^1.2.5",
     "node-fetch": "^2.6.2"
