@@ -39,7 +39,7 @@ const getContentMetadata = context => {
 
 // Does the provided only_labeled filter match the labels on the item in question?
 const labelFilterMatch = (only_labeled, labels) => {
-  if only_labeled.length = 0 {
+  if(only_labeled.length == 0) {
     return true;
   }
 
@@ -60,8 +60,7 @@ async function run() {
 
     const content_metadata = getContentId(github.context);
 
-
-    if !labelFilterMatch(only_labeled, content_metadata.labels) {
+    if(!labelFilterMatch(only_labeled, content_metadata.labels)) {
       console.info("No matching labels. Skipping");
       return;
     }
