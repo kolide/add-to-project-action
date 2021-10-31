@@ -1,116 +1,42 @@
-# Create a JavaScript Action
+# Add to Project
 
-<p align="center">
-  <a href="https://github.com/actions/javascript-action/actions"><img alt="javscript-action status" src="https://github.com/actions/javascript-action/workflows/units-test/badge.svg"></a>
-</p>
+This is a simple github action to add something to an organization
+level [github
+project](https://docs.github.com/en/issues/organizing-your-work-with-project-boards). It's
+designed to work with PRs or Issues, though could be adapted to other
+kinds of events.
 
-Use this template to bootstrap the creation of a JavaScript action.:rocket:
+Using this requires a PAT with appropriate permissions. At this time, that appears to be:
+* `repo` (yes, all of it)
+* `write:org`
+* `read:org`
+I believe that you can use [this link](https://github.com/settings/tokens/new?scopes=repo,write:org&description=GHPROJECT_TOKEN) to create one.
 
-This template includes tests, linting, a validation workflow, publishing, and versioning guidance.
+It was adapted from the documented [example](https://docs.github.com/en/issues/trying-out-the-new-projects-experience/automating-projects).
 
-If you are new, there's also a simpler introduction.  See the [Hello World JavaScript Action](https://github.com/actions/hello-world-javascript-action)
+## How To Use
 
-## Create an action from this template
+``` yaml
+    steps:
+      - uses: kolide/add-to-project-action@v1
+        with:
+          token: ${{secrets.PROJECT_WORKFLOW_PAT}}
+          organization: kolide
+          project_number: 9
+          content_id: ${{ github.event.issue.node_id }}
 
-Click the `Use this Template` and provide the new repo details for your action
-
-## Code in Main
-
-Install the dependencies
-
-```bash
-npm install
 ```
 
-Run the tests :heavy_check_mark:
+## Development & Deployment
 
-```bash
-$ npm test
+This repo stems from the github example javascript action. Reminders about the commands:
 
- PASS  ./index.test.js
-  ✓ throws invalid number (3ms)
-  ✓ wait 500 ms (504ms)
-  ✓ test runs (95ms)
-...
-```
+| Update Dependencies              | `npm install`        |
+| Run Tests (there are none        | `npm test`           |
+| build / package for distribution | `npm run prepare`    |
+| tag and version                  | (normal git commands |
 
-## Change action.yml
 
-The action.yml defines the inputs and output for your action.
+## Future Work
 
-Update the action.yml with your name, description, inputs and outputs for your action.
-
-See the [documentation](https://help.github.com/en/articles/metadata-syntax-for-github-actions)
-
-## Change the Code
-
-Most toolkit and CI/CD operations involve async operations so the action is run in an async function.
-
-```javascript
-const core = require('@actions/core');
-...
-
-async function run() {
-  try {
-      ...
-  }
-  catch (error) {
-    core.setFailed(error.message);
-  }
-}
-
-run()
-```
-
-See the [toolkit documentation](https://github.com/actions/toolkit/blob/master/README.md#packages) for the various packages.
-
-## Package for distribution
-
-GitHub Actions will run the entry point from the action.yml. Packaging assembles the code into one file that can be checked in to Git, enabling fast and reliable execution and preventing the need to check in node_modules.
-
-Actions are run from GitHub repos.  Packaging the action will create a packaged action in the dist folder.
-
-Run prepare
-
-```bash
-npm run prepare
-```
-
-Since the packaged index.js is run from the dist folder.
-
-```bash
-git add dist
-```
-
-## Create a release branch
-
-Users shouldn't consume the action from master since that would be latest code and actions can break compatibility between major versions.
-
-Checkin to the v1 release branch
-
-```bash
-git checkout -b v1
-git commit -a -m "v1 release"
-```
-
-```bash
-git push origin v1
-```
-
-Note: We recommend using the `--license` option for ncc, which will create a license file for all of the production node modules used in your project.
-
-Your action is now published! :rocket:
-
-See the [versioning documentation](https://github.com/actions/toolkit/blob/master/docs/action-versioning.md)
-
-## Usage
-
-You can now consume the action by referencing the v1 branch
-
-```yaml
-uses: actions/javascript-action@v1
-with:
-  milliseconds: 1000
-```
-
-See the [actions tab](https://github.com/actions/javascript-action/actions) for runs of this action! :rocket:
+There is likely cleanup that can be done moving to the [action toolkit's github](https://github.com/actions/toolkit/tree/main/packages/github) client. This would probably allow a simplification.

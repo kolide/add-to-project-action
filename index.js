@@ -51,14 +51,14 @@ async function run() {
 
     const project_metadata_vars = { org: organization, number: parseInt(project_number) };
     const project_metadata_resp = await gh_query(github_token, project_metadata_query, project_metadata_vars);
-    core.debug(project_metadata_resp);
+    core.debug("Project Metadata: " + JSON.stringify(project_metadata_resp));
 
     const project_id = project_metadata_resp["data"]["organization"]["projectNext"]["id"];
     core.debug(`Found project_id: ${project_id}`);
 
     const mutation_vars = { project: project_id, target: content_id };
     const mutation_resp = await gh_query(github_token, add_to_project_mutation, mutation_vars);
-    core.debug(mutation_resp);
+    core.debug("Mutation Response: " + JSON.stringify(mutation_resp));
 
     const card_id = mutation_resp["data"]["addProjectNextItem"]["projectNextItem"]["id"];
     core.debug(`Got card_id: ${card_id}`);
