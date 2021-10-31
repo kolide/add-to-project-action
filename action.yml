@@ -1,13 +1,21 @@
-name: 'Wait'
-description: 'Wait a designated number of milliseconds'
+name: 'Add To A Project'
+description: 'Add something to a GitHub Project'
 inputs:
-  milliseconds:  # id of input
-    description: 'number of milliseconds to wait'
+  token:
+    description: 'A GitHub PAT with org:write'
     required: true
-    default: '1000'
+  organization:
+    description: 'The name of the GitHub organization'
+    required: true
+  project_number:
+    description: 'Project board number'
+    required: true
+  content_id:
+    description: 'The GitHub global ID of the item to be added'
+    required: true
 outputs:
-  time: # output will be available to future steps
-    description: 'The current time after waiting'
+  card_id:
+    description: 'The card ID for the item on the board'
 runs:
   using: 'node12'
   main: 'dist/index.js'
