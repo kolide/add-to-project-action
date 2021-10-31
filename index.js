@@ -29,9 +29,9 @@ mutation($project:ID!, $target:ID!) {
 const getContentMetadata = context => {
   switch(context.eventName) {
   case 'pull_request', 'pull_request_target':
-    return {id: context.payload.pull_request.node_id, labels: github.event.pull_request.labels };
+    return {id: context.payload.pull_request.node_id, labels: context.payload.pull_request.labels };
   case 'issues':
-    return {id: context.payload.issue.node_id, labels: github.event.issue.labels };
+    return {id: context.payload.issue.node_id, labels: context.payload.issue.labels };
   default:
     throw new Error(`Unknown event type ${context.eventName}`);
   };
