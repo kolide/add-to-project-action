@@ -8519,9 +8519,9 @@ mutation($project:ID!, $target:ID!) {
 const getContentMetadata = context => {
   switch(context.eventName) {
   case 'pull_request', 'pull_request_target':
-    return {id: context.payload.pull_request.node_id, labels: github.event.pull_request.labels };
+    return {id: context.payload.pull_request.node_id, labels: _actions_github__WEBPACK_IMPORTED_MODULE_1__.event.pull_request.labels };
   case 'issues':
-    return {id: context.payload.issue.node_id, labels: github.event.issue.labels };
+    return {id: context.payload.issue.node_id, labels: _actions_github__WEBPACK_IMPORTED_MODULE_1__.event.issue.labels };
   default:
     throw new Error(`Unknown event type ${context.eventName}`);
   };
@@ -8548,7 +8548,7 @@ async function run() {
     const project_number = _actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput("project_number");
     const only_labeled = _actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput("only_labeled").split(',');
 
-    const content_metadata = getContentId(_actions_github__WEBPACK_IMPORTED_MODULE_1__.context);
+    const content_metadata = getContentMetadata(_actions_github__WEBPACK_IMPORTED_MODULE_1__.context);
 
     if(!labelFilterMatch(only_labeled, content_metadata.labels)) {
       console.info("No matching labels. Skipping");

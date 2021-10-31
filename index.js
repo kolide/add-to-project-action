@@ -58,7 +58,7 @@ async function run() {
     const project_number = core.getInput("project_number");
     const only_labeled = core.getInput("only_labeled").split(',');
 
-    const content_metadata = getContentId(github.context);
+    const content_metadata = getContentMetadata(github.context);
 
     if(!labelFilterMatch(only_labeled, content_metadata.labels)) {
       console.info("No matching labels. Skipping");
