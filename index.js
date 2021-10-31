@@ -1,5 +1,5 @@
 const core = require('@actions/core');
-const wait = require('./wait');
+const fetch = require("node-fetch");
 
 const project_metadata_query = `
 query($org: String!, $number: Int!) {
