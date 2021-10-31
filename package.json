@@ -1,7 +1,7 @@
 {
-  "name": "javascript-action",
+  "name": "add-to-project",
   "version": "1.0.0",
-  "description": "JavaScript Action Template",
+  "description": "Adds a item to a GitHub Project",
   "main": "index.js",
   "scripts": {
     "lint": "eslint .",
@@ -11,21 +11,22 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/actions/javascript-action.git"
+    "url": "git+https://github.com/directionless/add-to-project-action.git"
   },
   "keywords": [
     "GitHub",
     "Actions",
     "JavaScript"
   ],
-  "author": "",
+  "author": "directionless",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/actions/javascript-action/issues"
+    "url": "https://github.com/directionless/add-to-project-action/issues"
   },
-  "homepage": "https://github.com/actions/javascript-action#readme",
+  "homepage": "https://github.com/directionless/add-to-project-action#readme",
   "dependencies": {
-    "@actions/core": "^1.2.5"
+    "@actions/core": "^1.2.5",
+    "node-fetch": "^3.0"
   },
   "devDependencies": {
     "@vercel/ncc": "^0.31.1",
