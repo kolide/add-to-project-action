@@ -59,7 +59,7 @@ jobs:
   add_to_board:
     runs-on: ubuntu-latest
     steps:
-      - uses: kolide/add-to-project-action@seph_labels
+      - uses: kolide/add-to-project-action@v1
         with:
           token: ${{secrets.PROJECT_WORKFLOW_PAT}}
           organization: kolide
