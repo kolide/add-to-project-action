@@ -19,6 +19,8 @@ It was adapted from the documented [example](https://docs.github.com/en/issues/t
 
 ## How To Use
 
+(The content_id is determined from the active github context.)
+
 ``` yaml
 on:
   pull_request:
@@ -37,7 +39,36 @@ jobs:
           project_number: 9
 ```
 
-(The content_id is determined from the active github context.)
+### Filtering by Label
+
+In many of our use cases, it's desirable to filter by label. This
+supports a simple check against the name. Specify as a comma
+delimited string. If the name has a space, it should keep the space. eg:
+
+``` yaml
+on:
+  issues:
+    types: [reopened, labeled]
+  pull_request_target:
+    types: [reopened, labeled]
+    branches:
+      - main
+      - master
+
+jobs:
+  add_to_board:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: kolide/add-to-project-action@v1
+        with:
+          token: ${{secrets.PROJECT_WORKFLOW_PAT}}
+          organization: kolide
+          project_number: 9
+          only_labeled: "bug,help wanted"
+
+```
+
+
 
 ## Development & Deployment
 

@@ -26,27 +26,46 @@ mutation($project:ID!, $target:ID!) {
   }
 }`;
 
-const getContentId = context => {
+const getContentMetadata = context => {
   switch(context.eventName) {
-  case 'pull_request':
-    return context.payload.pull_request.node_id;
-  case 'pull_request_target':
-    return context.payload.pull_request.node_id;
+  case 'pull_request', 'pull_request_target':
+    return {id: context.payload.pull_request.node_id, labels: context.payload.pull_request.labels };
   case 'issues':
-    return context.payload.issue.node_id;
+    return {id: context.payload.issue.node_id, labels: context.payload.issue.labels };
   default:
     throw new Error(`Unknown event type ${context.eventName}`);
   };
 };
+
+// Does the provided only_labeled filter match the labels on the item in question?
+const labelFilterMatch = (only_labeled, labels) => {
+  if(only_labeled.length == 0) {
+    return true;
+  }
+
+  // Any matches? This maps the label to get just then name, then
+  // method chains to filter to what we want.
+  return labels
+    .map(l => l.name)
+    .filter(l => only_labeled.includes(l))
+    .length > 0;
+}
 
 // most @actions toolkit packages have async methods
 async function run() {
   try {
     const organization = core.getInput("organization");
     const project_number = core.getInput("project_number");
+    const only_labeled = core.getInput("only_labeled").split(',');
 
-    const content_id = getContentId(github.context);
-    core.info(`Going to add '${content_id}' to ${organization}/${project_number}`);
+    const content_metadata = getContentMetadata(github.context);
+
+    if(!labelFilterMatch(only_labeled, content_metadata.labels)) {
+      console.info("No matching labels. Skipping");
+      return;
+    }
+
+    core.info(`Going to add '${content_metadata.id}' to ${organization}/${project_number}`);
 
     const octokit = github.getOctokit(core.getInput("token"));
 
@@ -62,13 +81,13 @@ async function run() {
 
     const mutation_resp = await octokit.graphql(
       add_to_project_mutation,
-      { project: project_id, target: content_id }
+      { project: project_id, target: content_metadata.id }
     );
     core.debug("Mutation Response:")
     core.debug(JSON.stringify(mutation_resp));
 
     const card_id = mutation_resp["addProjectNextItem"]["projectNextItem"]["id"];
-    core.debug(`Got card_id: ${card_id}`);
+    core.info(`Added to board as card_id: '${card_id}'`);
 
     core.setOutput('card_id', card_id);
   } catch (error) {

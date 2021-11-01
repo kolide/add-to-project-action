@@ -8516,27 +8516,46 @@ mutation($project:ID!, $target:ID!) {
   }
 }`;
 
-const getContentId = context => {
+const getContentMetadata = context => {
   switch(context.eventName) {
-  case 'pull_request':
-    return context.payload.pull_request.node_id;
-  case 'pull_request_target':
-    return context.payload.pull_request.node_id;
+  case 'pull_request', 'pull_request_target':
+    return {id: context.payload.pull_request.node_id, labels: context.payload.pull_request.labels };
   case 'issues':
-    return context.payload.issue.node_id;
+    return {id: context.payload.issue.node_id, labels: context.payload.issue.labels };
   default:
     throw new Error(`Unknown event type ${context.eventName}`);
   };
 };
+
+// Does the provided only_labeled filter match the labels on the item in question?
+const labelFilterMatch = (only_labeled, labels) => {
+  if(only_labeled.length == 0) {
+    return true;
+  }
+
+  // Any matches? This maps the label to get just then name, then
+  // method chains to filter to what we want.
+  return labels
+    .map(l => l.name)
+    .filter(l => only_labeled.includes(l))
+    .length > 0;
+}
 
 // most @actions toolkit packages have async methods
 async function run() {
   try {
     const organization = _actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput("organization");
     const project_number = _actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput("project_number");
+    const only_labeled = _actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput("only_labeled").split(',');
 
-    const content_id = getContentId(_actions_github__WEBPACK_IMPORTED_MODULE_1__.context);
-    _actions_core__WEBPACK_IMPORTED_MODULE_0__.info(`Going to add '${content_id}' to ${organization}/${project_number}`);
+    const content_metadata = getContentMetadata(_actions_github__WEBPACK_IMPORTED_MODULE_1__.context);
+
+    if(!labelFilterMatch(only_labeled, content_metadata.labels)) {
+      console.info("No matching labels. Skipping");
+      return;
+    }
+
+    _actions_core__WEBPACK_IMPORTED_MODULE_0__.info(`Going to add '${content_metadata.id}' to ${organization}/${project_number}`);
 
     const octokit = _actions_github__WEBPACK_IMPORTED_MODULE_1__.getOctokit(_actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput("token"));
 
@@ -8552,13 +8571,13 @@ async function run() {
 
     const mutation_resp = await octokit.graphql(
       add_to_project_mutation,
-      { project: project_id, target: content_id }
+      { project: project_id, target: content_metadata.id }
     );
     _actions_core__WEBPACK_IMPORTED_MODULE_0__.debug("Mutation Response:")
     _actions_core__WEBPACK_IMPORTED_MODULE_0__.debug(JSON.stringify(mutation_resp));
 
     const card_id = mutation_resp["addProjectNextItem"]["projectNextItem"]["id"];
-    _actions_core__WEBPACK_IMPORTED_MODULE_0__.debug(`Got card_id: ${card_id}`);
+    _actions_core__WEBPACK_IMPORTED_MODULE_0__.info(`Added to board as card_id: '${card_id}'`);
 
     _actions_core__WEBPACK_IMPORTED_MODULE_0__.setOutput('card_id', card_id);
   } catch (error) {

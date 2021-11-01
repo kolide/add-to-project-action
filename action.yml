@@ -5,11 +5,13 @@ inputs:
     description: 'A GitHub PAT with org:write'
     required: true
   organization:
-    description: 'The name of the GitHub organization'
+    description: The name of the GitHub organization
     required: true
   project_number:
-    description: 'Project board number'
+    description: Project board number
     required: true
+  only_labeled:
+    description: Comma delimited list of label names. If set, acts as a filter.
 outputs:
   card_id:
     description: 'The card ID for the item on the board'
