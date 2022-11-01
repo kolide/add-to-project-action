@@ -1,3 +1,9 @@
+# Deprecated
+
+Use https://github.com/actions/add-to-project
+
+
+
 # Add to Project
 
 This is a simple github action to add something to an organization
